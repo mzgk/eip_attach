@@ -2,27 +2,27 @@
 
 #---
 #　自分にEIPがアタッチされていなければ、プール分からアタッチする。
-# 起動時だと５台でEIPを取り合うので、バッティングして取得できない場合がある。
-# なので、cronで１分間隔で処理をする。
-# eip.txtの有無で判断するのは、無駄な通信を減らすため。
+# 起動時だと複数台でEIPを取り合うので、バッティングしてアタッチに失敗する場合がある。
+# なので、cronを使って間隔で処理をする。
+# eip_attached.txtの有無で判断するのは、無駄なcurlを減らすため。
 #
-# - /home/ec2-user/eip.txtがあるか（初回は存在しない）
+# - /home/ec2-user/eip_attached.txtがあるか（初回は存在しない）
 #   - Yes : EIPアタッチ済みなので終了
 #   - No : 未アタッチなので次の処理へ
 # - 自分にEIPがアタッチされているか（再検査）
-#   - Yes : /ec2-user/home/eip.txtを作成して終了
+#   - Yes : /ec2-user/home/eip_attached.txtを作成して終了
 #   - No : 次へ
 # - プールから１つ取得
 #   - 取得したIPが他にアタッチされているか
 #     - Yes : 次のプールIPへ
-#     - No : 自分にアタッチして、/ec2-user/home/eip.txtを作成して終了
+#     - No : 自分にアタッチして、/ec2-user/home/eip_attached.txtを作成して終了
 #---
 
 EIP_LIST=""
 EIP_TXT="/home/ec2-user/eip_attached.txt"
 
 
-# /home/ec2-user/eip.txtが存在するか
+# /home/ec2-user/eip_attached.txtが存在するか
 if [ -f ${EIP_TXT} ]; then
   exit 0
 fi
